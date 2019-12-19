@@ -555,28 +555,15 @@ float phi(vec3 v, vec3 N, vec3 X)
     return sinphi < 0 ? 2*PI-phi : phi;
 }
 
-// uint round_idx(float v, const uint idxmax){
-//     return uint(clamp(uint(v) + 0.5, 0, idxmax-uint(1)));
-// }
 uint round_idx(float v, const uint idxmax){
-    return uint((clamp(v + 0.5, 0, idxmax-uint(1))));
+    return uint(clamp(v + 0.5, 0, idxmax-uint(1)));
 }
-
-// uint circ_idx(float v, const uint idxmax){
-//     uint val = uint(v) >= float(idxmax) ? uint(0) : uint(v);
-//     return val;
-// }
 
 uint circ_idx(float v, const uint idxmax){
     uint val = v >= float(idxmax) ? uint(0) : uint(v);
     return val;
 }
 
-
-// uint round_circ_idx(float v, const uint idxmax){
-//     uint val = uint(v) + 0.5 >= float(idxmax) ? uint(0) : uint(uint(v) + 0.5);
-//     return val;
-// }
 uint round_circ_idx(float v, const uint idxmax){
     uint val = v + 0.5 >= float(idxmax) ? uint(0) : uint(v + 0.5);
     return val;
@@ -594,7 +581,6 @@ vec3 neighbor3(float theta_i_fidx, float theta_o_fidx, float phi_o_fidx)
     idx += uint(theta_i_idx * n_ph_o * n_th_o);
     return table[idx];
 }
-
 
 vec3 bilinear3(float theta_i_fidx, float theta_o_fidx, float phi_o_fidx)
 {
@@ -653,11 +639,9 @@ vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
 
     vec3 val;
     if (interpolation){
-    //    val = bilinear4(theta_i_fidx, phi_i_fidx, theta_o_fidx, phi_o_fidx);
        val = bilinear3(theta_i_fidx, theta_o_fidx, phi_o_fidx);
     }
     else{
-    //    val = neighbor(theta_i_fidx, phi_i_fidx, theta_o_fidx, phi_o_fidx);
        val = neighbor3(theta_i_fidx, theta_o_fidx, phi_o_fidx);
     }
 
