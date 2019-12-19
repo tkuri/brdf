@@ -589,7 +589,11 @@ vec3 bilinear3(float theta_i_fidx, float theta_o_fidx, float phi_o_fidx)
     uint theta_o_idx[2] = {uint(theta_o_fidx), min(uint(theta_o_fidx + 1.0), n_th_o-uint(1))};
     uint phi_o_idx[2] = {uint(phi_o_fidx), circ_idx(phi_o_fidx + 1.0,  n_ph_o)};
 
-    uint idx[2*2*2*2];
+    float theta_i_ratio = theta_i_fidx - theta_i_idx[0];
+    float theta_o_ratio = theta_o_fidx - theta_o_idx[0];
+    float phi_o_ratio = phi_o_fidx - phi_o_idx[0];
+
+    uint idx[2*2*2];
     for (int i=0; i<2; i++){ // theta_in
         for (int k=0; k<2; k++){ // theta_out
             for (int l=0; l<2; l++){ // phi_delta
@@ -600,10 +604,6 @@ vec3 bilinear3(float theta_i_fidx, float theta_o_fidx, float phi_o_fidx)
         }
     }
     
-    float theta_i_ratio = theta_i_fidx - theta_i_idx[0];
-    float theta_o_ratio = theta_o_fidx - theta_o_idx[0];
-    float phi_o_ratio = phi_o_fidx - phi_o_idx[0];
-
     vec3 v[2*2*2];
     vec3 val = {0.0, 0.0, 0.0};
     for (int i=0; i<2; i++){ // theta_in
@@ -613,8 +613,7 @@ vec3 bilinear3(float theta_i_fidx, float theta_o_fidx, float phi_o_fidx)
                 ratio *= (theta_o_ratio*k+(1.0-theta_o_ratio)*(1-k));
                 ratio *= (phi_o_ratio*l+(1.0-phi_o_ratio)*(1-l));
 
-                v[l + 2*k + 4*i] = clamp(table[idx[l + 2*k + 4*i]], 0, maxValue) * ratio;
-                val += v[l + 2*k + 4*i];
+                val += clamp(table[idx[l + 2*k + 4*i]], 0, maxValue) * ratio; // clamp if value is very high
             }
         }
     }
