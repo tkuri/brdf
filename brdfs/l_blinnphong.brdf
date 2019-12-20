@@ -14,7 +14,7 @@ float specularR 0.0 1.0 0.1
 float specularG 0.0 1.0 0.1
 float specularB 0.0 1.0 0.1
 float n 1 1000 100
-bool divide_by_NdotL 1
+bool divide_by_NdotL 0
 ::end parameters
 
 
@@ -24,6 +24,8 @@ bool divide_by_NdotL 1
 
 ::begin shader
 
+const float PI = 3.14159265358979323846;
+
 vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
 {
     vec3 H = normalize(L+V);
@@ -31,7 +33,7 @@ vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
     float val = pow(max(0,dot(N,H)),n);
     if (divide_by_NdotL)
         val = val / dot(N,L);
-    return (vec3(reflectanceR,reflectanceG,reflectanceB) / 3.14159265 + vec3(specularR, specularG, specularB)*val);
+    return (vec3(reflectanceR,reflectanceG,reflectanceB) / PI + vec3(specularR, specularG, specularB)*val);
 }
 
 ::end shader
