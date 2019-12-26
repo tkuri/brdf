@@ -7,12 +7,10 @@ analytic
 # [type] [name] [min val] [max val] [default val]
 
 ::begin parameters
-float reflectanceR 0.0 1.0 0.1
-float reflectanceG 0.0 1.0 0.1
-float reflectanceB 0.0 1.0 0.1
-float specularR 0.0 1.0 0.1
-float specularG 0.0 1.0 0.1
-float specularB 0.0 1.0 0.1
+float diffuseR 0.0 1.0 0.1
+float diffuseG 0.0 1.0 0.1
+float diffuseB 0.0 1.0 0.1
+float specular 0.0 1.0 0.1
 float n 1 1000 100
 bool divide_by_NdotL 0
 ::end parameters
@@ -33,7 +31,7 @@ vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
     float val = pow(max(0,dot(N,H)),n);
     if (divide_by_NdotL)
         val = val / dot(N,L);
-    return (vec3(reflectanceR,reflectanceG,reflectanceB) / PI + vec3(specularR, specularG, specularB)*val);
+    return (vec3(diffuseR,diffuseG,diffuseB) / PI + vec3(specular, specular, specular)*val);
 }
 
 ::end shader
