@@ -1,0 +1,64 @@
+analytic
+
+# Walter07, w/ GGX
+
+# variables go here...
+# only floats supported right now.
+# [type] [name] [min val] [max val] [default val]
+
+::begin parameters
+float diffuseR 0.0 1.0 0.1
+float diffuseG 0.0 1.0 0.1
+float diffuseB 0.0 1.0 0.1
+float specular 0.0 1.0 0.1
+
+float m 0.001 1 .1
+float f0 0 1 .1
+bool useFresnel 0
+::end parameters
+
+::begin shader
+
+const float PI = 3.14159265358979323846;
+
+float Fresnel(float f0, float u)
+{
+    // from Schlick
+    return f0 + (1-f0) * pow(1-u, 5);
+}
+
+
+float sqr(float x) { return x*x; }
+
+float GGX(float NdotH, float alphaG)
+{
+    return m*m / (PI * sqr(NdotH*NdotH*(m*m-1) + 1));
+}
+
+float smithG_GGX(float Ndotv, float alphaG)
+{
+    return 2/(1 + sqrt(1 + m*m * (1-Ndotv*Ndotv)/(Ndotv*Ndotv)));
+}
+
+vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
+{
+    float NdotL = dot(N, L);
+    float NdotV = dot(N, V);
+    if (NdotL < 0 || NdotV < 0) return vec3(0);
+
+    vec3 H = normalize(L+V);
+    float NdotH = dot(N, H);
+    float VdotH = dot(V, H);
+
+    float D = GGX(NdotH, m);
+    float G = smithG_GGX(NdotL, m) * smithG_GGX(NdotV, m);
+
+    float F = useFresnel ? Fresnel(f0, VdotH) : 1.0;
+
+    float spe = D * G * F / (PI * NdotL * NdotV);
+    vec3 val = vec3(diffuseR,diffuseG,diffuseB) / PI;
+    val += vec3(specular, specular, specular)*spe;
+    return val;
+}
+
+::end shader

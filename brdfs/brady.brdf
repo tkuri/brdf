@@ -1,0 +1,59 @@
+analytic
+
+# variables go here...
+# only floats supported right now.
+# [type] [name] [min val] [max val] [default val]
+
+::begin parameters
+float diffuseR 0.0 1.0 0.1
+float diffuseG 0.0 1.0 0.1
+float diffuseB 0.0 1.0 0.1
+float specular 0.0 1.0 0.1
+
+float alpha -5.0 5.0 1.0
+float beta 0.01 1 1.0
+float f0 0.01 1 0.5
+::end parameters
+
+
+# Then comes the shader. This should be GLSL code
+# that defines a function called BRDF (although you can
+# add whatever else you want too, like sqr() below).
+
+::begin shader
+
+
+const float PI = 3.14159265358979323846;
+
+float sqr(float x) { return x*x; }
+
+
+float Fresnel(float f0, float u)
+{
+    // from Schlick
+    return f0 + (1-f0) * pow(1-u, 5);
+}
+
+vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )
+{
+    // compute the half vec3
+    vec3 H = normalize( L + V );
+
+    float NdotH = dot(N, H);
+    float VdotH = dot(V, H);
+    float LdotH = dot(L, H);
+
+    float tant = tan(acos(NdotH));
+    float F = Fresnel(f0, VdotH);
+
+    float spe = F;
+    spe /= 4*LdotH;
+    spe *= exp(-(pow(tant/(beta*beta), alpha)));
+
+    vec3 val = vec3(diffuseR,diffuseG,diffuseB) / PI;
+    val += vec3(specular, specular, specular)*spe;
+
+    return val;
+}
+
+::end shader
